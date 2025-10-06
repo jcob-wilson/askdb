@@ -1,0 +1,65 @@
+# --- Node & package managers ---
+node_modules/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Next.js build & export outputs ---
+.next/
+out/                 # `next export`
+.vercel/             # Vercel project settings
+
+# --- Optional build dirs used by tools ---
+dist/
+build/
+storybook-static/
+
+# --- Environment files (keep examples) ---
+.env
+.env.*
+!.env.example
+
+# --- TypeScript ---
+*.tsbuildinfo
+
+# --- Lint/format caches ---
+.eslintcache
+
+# --- Turborepo / Turbopack ---
+.turbo/
+turbo-build.log
+
+# --- Testing / coverage ---
+coverage/
+.nyc_output/
+cypress/
+playwright-report/
+test-results/
+
+# --- next-pwa (if used) ---
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.pid
+*.pid.lock
+
+# --- IDE settings (keep common shared JSON if you want) ---
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# --- Temp files ---
+.tmp/
+temp/

@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --foreground-rgb: 17, 24, 39;
+    --background-start-rgb: 249, 250, 251;
+    --background-end-rgb: 255, 255, 255;
+    --border-rgb: 229, 231, 235;
+    --card-rgb: 255, 255, 255;
+    --card-border-rgb: 229, 231, 235;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --foreground-rgb: 249, 250, 251;
+        --background-start-rgb: 17, 24, 39;
+        --background-end-rgb: 31, 41, 55;
+        --border-rgb: 55, 65, 81;
+        --card-rgb: 31, 41, 55;
+        --card-border-rgb: 55, 65, 81;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(135deg,
+            rgb(var(--background-start-rgb)) 0%,
+            rgb(var(--background-end-rgb)) 100%);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(var(--background-start-rgb));
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(156, 163, 175);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(107, 114, 128);
+}
+
+/* Selection styles */
+::selection {
+    background-color: rgb(14, 165, 233);
+    color: white;
+}
+
+/* Focus styles */
+:focus-visible {
+    outline: 2px solid rgb(14, 165, 233);
+    outline-offset: 2px;
+}
+
+@layer base {
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.025em;
+    }
+    
+    h1 {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+    }
+    
+    h2 {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+    }
+    
+    h3 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+    
+    h4 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+    }
+    
+    h5 {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+    
+    h6 {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    
+    .btn-primary {
+        @apply btn bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-lg hover:shadow-xl;
+    }
+    
+    .btn-secondary {
+        @apply btn bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white border border-gray-200/50 hover:border-gray-300/50 shadow-sm hover:shadow-md;
+    }
+    
+    .btn-success {
+        @apply btn bg-gradient-to-r from-success-600 to-success-700 text-white hover:from-success-700 hover:to-success-800 focus:ring-success-500 shadow-lg hover:shadow-xl;
+    }
+    
+    .btn-warning {
+        @apply btn bg-gradient-to-r from-warning-600 to-warning-700 text-white hover:from-warning-700 hover:to-warning-800 focus:ring-warning-500 shadow-lg hover:shadow-xl;
+    }
+    
+    .btn-error {
+        @apply btn bg-gradient-to-r from-error-600 to-error-700 text-white hover:from-error-700 hover:to-error-800 focus:ring-error-500 shadow-lg hover:shadow-xl;
+    }
+    
+    .card {
+        @apply bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft border border-white/20 overflow-hidden;
+    }
+    
+    .card-hover {
+        @apply card hover:shadow-large transition-all duration-300;
+    }
+    
+    .card-glass {
+        @apply bg-white/10 backdrop-blur-xl rounded-2xl shadow-large border border-white/20 overflow-hidden;
+    }
+    
+  .input {
+    @apply w-full px-4 py-3 text-sm border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all duration-300 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-900 placeholder-gray-500;
+  }
+    
+    .input-error {
+        @apply input border-error-300/50 focus:ring-error-500/50 focus:border-error-500/50;
+    }
+    
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm;
+    }
+    
+    .badge-primary {
+        @apply badge bg-primary-100/80 text-primary-800 border border-primary-200/50;
+    }
+    
+    .badge-success {
+        @apply badge bg-success-100/80 text-success-800 border border-success-200/50;
+    }
+    
+    .badge-warning {
+        @apply badge bg-warning-100/80 text-warning-800 border border-warning-200/50;
+    }
+    
+    .badge-error {
+        @apply badge bg-error-100/80 text-error-800 border border-error-200/50;
+    }
+    
+    .badge-gray {
+        @apply badge bg-gray-100/80 text-gray-800 border border-gray-200/50;
+    }
+    
+    .glass-panel {
+        @apply bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-large;
+    }
+    
+    .gradient-text {
+        @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+    }
+    
+    .floating-card {
+        @apply bg-white/90 backdrop-blur-xl rounded-2xl shadow-large border border-white/30 hover:shadow-xl transition-all duration-300;
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .animate-slide-up {
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    .animate-slide-down {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .animate-pulse-soft {
+        animation: pulseSoft 2s ease-in-out infinite;
+    }
+}
