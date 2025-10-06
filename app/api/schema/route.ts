@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 import { MongoClient } from 'mongodb';
+import { rateLimit } from '@/lib/rateLimiter';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 interface SchemaData {
     database: string;
@@ -13,6 +17,12 @@ interface SchemaData {
 
 export async function POST(request: NextRequest) {
     try {
+        const tenantId = getTenantIdFromRequest(request);
+        const rl = await rateLimit(`schema:${tenantId}`, { windowSeconds: 60, max: 20 });
+        if (!rl.allowed) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+        const session = await getServerSession(authOptions);
+        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
         const { connectionString, database } = await request.json();
 
         if (!connectionString || !database) {

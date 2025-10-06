@@ -77,7 +77,7 @@ Respond with ONLY the JSON object, no additional text.`;
 
     try {
         const completion = await openai.chat.completions.create({
-            model: "gpt-4",
+            model: "gpt-3.5-turbo",
             messages: [
                 {
                     role: "system",
@@ -89,7 +89,7 @@ Respond with ONLY the JSON object, no additional text.`;
                 }
             ],
             temperature: 0.1,
-            max_tokens: 2000
+            max_tokens: 500
         });
 
         const response = completion.choices[0]?.message?.content;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession, signIn } from 'next-auth/react';
 import { Search, Database, BarChart3, Table, Loader2, Settings, History } from 'lucide-react';
 import { QueryInterface } from '@/components/QueryInterface';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
@@ -10,6 +11,15 @@ import { SchemaEditor } from '@/components/SchemaEditor';
 import { QueryHistory } from '@/components/QueryHistory';
 
 export default function Home() {
+  const { status } = useSession();
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      signIn();
+    }
+  }, [status]);
+
+  if (status === 'unauthenticated') return null;
+  
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);

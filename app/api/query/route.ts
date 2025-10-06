@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 import { generateMongoQuery } from '@/lib/openai';
-import { runMongoAggregation, runMongoFind } from '@/lib/mongodb';
+import clientPromise, { runMongoAggregation, runMongoFind } from '@/lib/mongodb';
+import { getPlanForUser, getTodayKey } from '@/lib/plans';
+import { rateLimit } from '@/lib/rateLimiter';
+import { getTenantIdFromRequest } from '@/lib/tenant';
 
 interface ChartSuggestion {
     type: string;
@@ -62,7 +67,37 @@ function generateFallbackChartSuggestions(data: any[]): ChartSuggestion[] {
 
 export async function POST(request: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
         const { query, schemaMetadata, connectionString } = await request.json();
+
+        // Apply per-IP/user rate limit
+        const tenantId = getTenantIdFromRequest(request);
+        const rlKey = `query:${tenantId}:${session.user?.email || 'anon'}`;
+        const rl = await rateLimit(rlKey, { windowSeconds: 60, max: 30 });
+        if (!rl.allowed) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+
+        const client = await clientPromise;
+        const db = client.db();
+        const users = db.collection('users');
+        const user = await users.findOne({ email: session.user?.email?.toLowerCase() });
+        const plan = getPlanForUser(user);
+
+        // const isSample = connectionString === 'sample';
+        // if (!isSample && !plan.allowExternalConnections) {
+        //     return NextResponse.json({ error: 'Your plan does not allow external connections' }, { status: 403 });
+        // }
+
+        // Enforce per-day query limits
+        const usageColl = db.collection('user_usage');
+        const todayKey = getTodayKey();
+        const usageDocId = `${tenantId}:${session.user?.email?.toLowerCase()}:${todayKey}`;
+        const usageDoc = await usageColl.findOne({ _id: usageDocId });
+        const used = usageDoc?.count || 0;
+        if (used >= plan.queryLimitPerDay) {
+            return NextResponse.json({ error: 'Daily query limit reached' }, { status: 429 });
+        }
 
         if (!query || !schemaMetadata) {
             return NextResponse.json(
@@ -99,6 +134,27 @@ export async function POST(request: NextRequest) {
         const chartSuggestions = assistantResponse.chart_suggestions && assistantResponse.chart_suggestions.length > 0
             ? assistantResponse.chart_suggestions
             : generateFallbackChartSuggestions(queryResult.data);
+
+        // Record query history server-side
+        try {
+            const resultCount = Array.isArray(queryResult?.data) ? queryResult.data.length : 0;
+            await db.collection('user_queries').insertOne({
+                tenantId,
+                userEmail: session.user?.email?.toLowerCase(),
+                query,
+                timestamp: new Date(),
+                connectionType: isSample ? 'sample' : 'external',
+                resultCount,
+                plan: plan.id,
+            });
+        } catch { }
+
+        // Increment usage count after successful query execution attempt
+        await db.collection('user_usage').updateOne(
+            { _id: usageDocId },
+            { $set: { date: todayKey }, $inc: { count: 1 } },
+            { upsert: true }
+        );
 
         return NextResponse.json({
             ...assistantResponse,
